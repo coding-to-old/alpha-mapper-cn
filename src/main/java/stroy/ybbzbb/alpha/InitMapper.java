@@ -2,7 +2,10 @@ package stroy.ybbzbb.alpha;
 
 
 import com.google.common.base.Stopwatch;
-import org.springframework.util.CollectionUtils;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import org.apache.commons.lang3.StringUtils;
+import stroy.ybbzbb.alpha.entity.Mapper;
 
 import java.io.*;
 import java.net.URL;
@@ -20,8 +23,7 @@ public class InitMapper {
 
     private static final boolean lazy = false;
 
-    private static final String FILE_NAME = "pca.csv";
-
+    private static final String FILE_NAME = "map.json";
 
     public void start(){
 
@@ -40,8 +42,7 @@ public class InitMapper {
 
         File file = new File(resource.getPath());
 
-
-        List<String> mapperData = new ArrayList<>(3250);
+        StringBuffer mapperBuffer = new StringBuffer();
         try(
                 final FileInputStream fileInput = new FileInputStream(file);
                 final InputStreamReader input = new InputStreamReader(fileInput,"UTF8");
@@ -51,7 +52,7 @@ public class InitMapper {
             String str;
 
             while ((str = buffere.readLine()) != null) {
-                mapperData.add(str);
+                mapperBuffer.append(str);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -59,15 +60,15 @@ public class InitMapper {
             e.printStackTrace();
         }
 
-        assertThat(CollectionUtils.isEmpty(mapperData)).withFailMessage("文件读取错误").isEqualTo(false);
+        assertThat(StringUtils.isBlank(mapperBuffer.toString()))
+                .withFailMessage("文件读取错误")
+                .isEqualTo(false);
+
+        List<Mapper> mappers = new Gson().fromJson(mapperBuffer.toString() , new TypeToken<ArrayList<Mapper>>() {}.getType());
 
 
-        System.out.println(" " + record.toString());
-
-
-
-
-
+        System.out.println(mappers.size());
+        System.out.println(mapperBuffer.toString());
     }
 
 
